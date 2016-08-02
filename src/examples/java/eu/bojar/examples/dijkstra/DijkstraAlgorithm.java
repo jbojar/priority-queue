@@ -1,4 +1,4 @@
-package eu.bojar.dijkstra;
+package eu.bojar.examples.dijkstra;
 
 import eu.bojar.priorityqueue.PriorityQueue;
 

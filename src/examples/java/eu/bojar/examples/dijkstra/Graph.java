@@ -1,4 +1,4 @@
-package eu.bojar.dijkstra;
+package eu.bojar.examples.dijkstra;
 
 import java.util.ArrayList;
 import java.util.HashMap;

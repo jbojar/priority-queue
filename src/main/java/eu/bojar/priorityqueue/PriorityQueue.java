@@ -5,13 +5,18 @@ import java.util.Comparator;
 
 public class PriorityQueue<T, P> {
 
-  final ArrayList<Element> tree;
+  private static final int DEFAULT_CAPACITY = 10;
 
+  final ArrayList<Element> tree;
   final Comparator<P> comparator;
+
+  public PriorityQueue() {
+    this(DEFAULT_CAPACITY);
+  }
 
   @SuppressWarnings("unchecked")
   public PriorityQueue(int capacity) {
-    this(capacity, (a, b) -> ((Comparable<P>)a).compareTo(b));
+    this(capacity, (a, b) -> ((Comparable<P>) a).compareTo(b));
   }
 
   public PriorityQueue(int capacity, Comparator<P> comparator) {
@@ -172,7 +177,8 @@ public class PriorityQueue<T, P> {
       if (tree.size() == 1) {
         tree.remove(idx);
         markRemoved();
-      } if (idx == tree.size() - 1) {
+      }
+      if (idx == tree.size() - 1) {
         markRemoved();
         tree.remove(idx);
       } else {

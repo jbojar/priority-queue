@@ -1,9 +1,10 @@
-# priority-queue
-Heap based Java PriorityQueue with changePriority operation.
+package eu.bojar.examples.simple;
 
-## Example usage
+import eu.bojar.priorityqueue.PriorityQueue;
 
-```java
+public class PriorityQueueSimpleExample {
+
+  public static void main(String[] args) {
     PriorityQueue<String, Integer> pq = new PriorityQueue<>();
 
     PriorityQueue<String, Integer>.Element element2 = pq.add("element2", 20);
@@ -26,6 +27,6 @@ Heap based Java PriorityQueue with changePriority operation.
       PriorityQueue<String, Integer>.Element element = pq.remove();
       System.out.println(String.format("value: %s priority: %d", element.value(), element.priority()));
     }
-```
 
-For other example usage see `eu.bojar.examples.dijkstra.DijkstraAlgorithm` in `src/examples/java` directory.
+  }
+}
