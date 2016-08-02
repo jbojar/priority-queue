@@ -1,0 +1,15 @@
+apply plugin: 'java'
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+repositories {
+    jcenter()
+}
+
+dependencies {
+    testCompile 'org.testng:testng:6.9.10'
+    testCompile 'org.assertj:assertj-core:3.4.1'
+}
+
+test.useTestNG()
