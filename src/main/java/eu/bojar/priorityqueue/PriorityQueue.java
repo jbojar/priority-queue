@@ -9,6 +9,7 @@ public class PriorityQueue<T, P> {
 
   final Comparator<P> comparator;
 
+  @SuppressWarnings("unchecked")
   public PriorityQueue(int capacity) {
     this(capacity, (a, b) -> ((Comparable<P>)a).compareTo(b));
   }
