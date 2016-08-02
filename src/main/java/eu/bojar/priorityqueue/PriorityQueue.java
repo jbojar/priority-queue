@@ -1,83 +1,21 @@
 package eu.bojar.priorityqueue;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 
-public class PriorityQueue<T, P extends Comparable<P>> {
-
-  public class Element {
-    public Element(T value, P priority, int idx) {
-      this.value = value;
-      this.priority = priority;
-      this.idx = idx;
-    }
-
-    T value;
-    P priority;
-    int idx;
-
-    boolean removed = false;
-
-    void markRemoved() {
-      removed = true;
-    }
-
-    public T getValue() {
-      return value;
-    }
-
-    public P getPriority() {
-      return priority;
-    }
-
-    public void changePriority(P newPriority) {
-      checkNodeValidity();
-      if (newPriority.compareTo(priority) < 0) {
-        priority = newPriority;
-        pullUp(idx);
-      } else if (newPriority.compareTo(priority) > 0) {
-        priority = newPriority;
-        pushDown(idx);
-      }
-    }
-
-    private void checkNodeValidity() {
-      if (removed) {
-        throw new IllegalStateException("node is no longer part of heap");
-      }
-    }
-
-    public boolean isValid() {
-      return !removed;
-    }
-
-    public void remove() {
-      checkNodeValidity();
-
-      if (tree.size() == 1) {
-        tree.remove(idx);
-        markRemoved();
-      } if (idx == tree.size() - 1) {
-        markRemoved();
-        tree.remove(idx);
-      } else {
-        markRemoved();
-        final Element nodeToMoveToThisIdx = tree.remove(tree.size() - 1);
-        nodeToMoveToThisIdx.idx = idx;
-        tree.set(idx, nodeToMoveToThisIdx);
-        if (tree.get(parent(idx)).priority.compareTo(nodeToMoveToThisIdx.priority) > 0) {
-          pullUp(idx);
-        } else {
-          pushDown(idx);
-        }
-      }
-
-    }
-  }
+public class PriorityQueue<T, P> {
 
   final ArrayList<Element> tree;
 
+  final Comparator<P> comparator;
+
   public PriorityQueue(int capacity) {
+    this(capacity, (a, b) -> ((Comparable<P>)a).compareTo(b));
+  }
+
+  public PriorityQueue(int capacity, Comparator<P> comparator) {
     tree = new ArrayList<>(capacity);
+    this.comparator = comparator;
   }
 
   public int size() {
@@ -90,7 +28,7 @@ public class PriorityQueue<T, P extends Comparable<P>> {
 
   public Element peek() {
     if (size() == 0) {
-      throw new IllegalStateException("Heap is empty");
+      throw new IllegalStateException("PriorityQueue is empty");
     }
     return tree.get(0);
   }
@@ -105,7 +43,7 @@ public class PriorityQueue<T, P extends Comparable<P>> {
 
   public Element remove() {
     if (size() == 0) {
-      throw new IllegalStateException("Heap is empty");
+      throw new IllegalStateException("PriorityQueue is empty");
     }
 
     if (tree.size() == 1) {
@@ -125,11 +63,11 @@ public class PriorityQueue<T, P extends Comparable<P>> {
   }
 
   private void pushDown(int i) {
-    while (leftChild(i) < size() && tree.get(leftChild(i)).priority.compareTo(tree.get(i).priority) < 0 ||
-            rightChild(i) < size() && tree.get(rightChild(i)).priority.compareTo(tree.get(i).priority) < 0) {
+    while (leftChild(i) < size() && compare(tree.get(leftChild(i)).priority, tree.get(i).priority) < 0 ||
+            rightChild(i) < size() && compare(tree.get(rightChild(i)).priority, tree.get(i).priority) < 0) {
       int leftChildIdx = leftChild(i);
       int rightChildIdx = rightChild(i);
-      if (rightChildIdx >= size() || tree.get(leftChildIdx).priority.compareTo(tree.get(rightChildIdx).priority) < 0) {
+      if (rightChildIdx >= size() || compare(tree.get(leftChildIdx).priority, tree.get(rightChildIdx).priority) < 0) {
         swap(i, leftChildIdx);
         i = leftChildIdx;
       } else {
@@ -140,7 +78,7 @@ public class PriorityQueue<T, P extends Comparable<P>> {
   }
 
   private void pullUp(int i) {
-    while (i != 0 && tree.get(parent(i)).priority.compareTo(tree.get(i).priority) > 0) {
+    while (i != 0 && compare(tree.get(parent(i)).priority, tree.get(i).priority) > 0) {
       swap(i, parent(i));
       i = parent(i);
     }
@@ -170,14 +108,84 @@ public class PriorityQueue<T, P extends Comparable<P>> {
   }
 
   private int compare(P a, P b) {
-    return a.compareTo(b);
+    return comparator.compare(a, b);
   }
 
   @Override
   public String toString() {
-    return "MinHeap{" +
+    return "PriorityQueue{" +
             "size=" + tree.size() +
             ", tree=" + tree +
             '}';
+  }
+
+  public class Element {
+    public Element(T value, P priority, int idx) {
+      this.value = value;
+      this.priority = priority;
+      this.idx = idx;
+    }
+
+    T value;
+    P priority;
+    int idx;
+
+    boolean removed = false;
+
+    void markRemoved() {
+      removed = true;
+    }
+
+    public T value() {
+      return value;
+    }
+
+    public P priority() {
+      return priority;
+    }
+
+    public void changePriority(P newPriority) {
+      checkNodeValidity();
+      if (compare(newPriority, priority) < 0) {
+        priority = newPriority;
+        pullUp(idx);
+      } else if (compare(newPriority, priority) > 0) {
+        priority = newPriority;
+        pushDown(idx);
+      }
+    }
+
+    private void checkNodeValidity() {
+      if (removed) {
+        throw new IllegalStateException("node is no longer part of heap");
+      }
+    }
+
+    public boolean isValid() {
+      return !removed;
+    }
+
+    public void remove() {
+      checkNodeValidity();
+
+      if (tree.size() == 1) {
+        tree.remove(idx);
+        markRemoved();
+      } if (idx == tree.size() - 1) {
+        markRemoved();
+        tree.remove(idx);
+      } else {
+        markRemoved();
+        final Element nodeToMoveToThisIdx = tree.remove(tree.size() - 1);
+        nodeToMoveToThisIdx.idx = idx;
+        tree.set(idx, nodeToMoveToThisIdx);
+        if (compare(tree.get(parent(idx)).priority, nodeToMoveToThisIdx.priority) > 0) {
+          pullUp(idx);
+        } else {
+          pushDown(idx);
+        }
+      }
+
+    }
   }
 }

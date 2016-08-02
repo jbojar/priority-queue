@@ -105,7 +105,7 @@ public class PriorityQueueTest {
     List<Integer> input = IntStream.range(0, 64).boxed().collect(Collectors.toList());
     Collections.shuffle(input);
 
-    final List<PriorityQueue.Element> nodes = input.stream().map(e -> heap.add(Integer.toString(e), e)).collect(Collectors.toList());
+    final List<PriorityQueue<String, Integer>.Element> nodes = input.stream().map(e -> heap.add(Integer.toString(e), e)).collect(Collectors.toList());
 
     // sanity check
     assertPriorityQueueStructure(heap);
@@ -113,7 +113,7 @@ public class PriorityQueueTest {
     // when
     IntStream.range(0, 10).forEach(i -> {
       int idxToRemove = ThreadLocalRandom.current().nextInt(nodes.size());
-      PriorityQueue.Element nodeToRemove = nodes.remove(idxToRemove);
+      PriorityQueue<String, Integer>.Element nodeToRemove = nodes.remove(idxToRemove);
 
       nodeToRemove.remove();
       assertThat(nodeToRemove.removed).isTrue();
@@ -134,8 +134,8 @@ public class PriorityQueueTest {
 
     // then
     assertThat(heap.size()).isEqualTo(2);
-    assertThat(heap.peek().getPriority()).isEqualTo(1);
-    assertThat(heap.peek().getValue()).isEqualTo("1");
+    assertThat(heap.peek().priority()).isEqualTo(1);
+    assertThat(heap.peek().value()).isEqualTo("1");
   }
 
   @Test
@@ -151,16 +151,16 @@ public class PriorityQueueTest {
     assertPriorityQueueStructure(heap);
 
     // when
-    List<PriorityQueue.Element> dequeued = new ArrayList<>(64);
+    List<PriorityQueue<String, Integer>.Element> dequeued = new ArrayList<>(64);
     while (heap.size() > 0) {
       dequeued.add(heap.remove());
       assertPriorityQueueStructure(heap);
     }
 
     // then
-    assertThat(dequeued).isSortedAccordingTo((e1, e2) -> e1.getPriority().compareTo(e2.getPriority()));
+    assertThat(dequeued).isSortedAccordingTo((e1, e2) -> e1.priority().compareTo(e2.priority()));
     assertThat(dequeued).allMatch(n -> n.removed);
-    assertThat(dequeued).allMatch(node -> node.getValue().equals(Objects.toString(node.getPriority())));
+    assertThat(dequeued).allMatch(node -> node.value().equals(Objects.toString(node.priority())));
   }
 
   @Test
@@ -181,7 +181,7 @@ public class PriorityQueueTest {
     }
     for (int h = heap.size() - 1; h > 0; h--) {
       assertThat(heap.tree.get(h).idx).as("Element index %d should be equal to its index in array %d", heap.tree.get(h).idx, h).isEqualTo(h);
-      assertThat(heap.tree.get(heap.parent(h)).getPriority()).as("Corrupted heap structure: %s", heap.toString()).isLessThanOrEqualTo(heap.tree.get(h).getPriority());
+      assertThat(heap.tree.get(heap.parent(h)).priority()).as("Corrupted heap structure: %s", heap.toString()).isLessThanOrEqualTo(heap.tree.get(h).priority());
     }
   }
 }
